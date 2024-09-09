@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  background-color: #F5F5F5;
 }
 
 .App-logo {
@@ -37,9 +38,43 @@
   }
 }
 
-
 .square {
   width: 100px;
   height: 100px;
   vertical-align: top;
+  border: solid 2px #333333;
+  background-color: white;
+  margin-left: -2px;
+  margin-top: -2px;
+  padding: 0;
+  /* display: inline-block; */
+}
+
+.cross {
+  display: inline-block;
+  text-align: top;
+  border: 1px solid black;
+  line-height: 96px;
+  font-size: 70px;
+  font-weight: bold;
+  color: #FF6B6B;
+}
+
+.circle {
+  display: inline-block;
+
+  border: 1px solid black;
+  line-height: 96px;
+  font-size: 40px;
+  font-weight: bold;
+  color: #4ECDC4;
+}
+
+.restartButton {
+  margin-top: 30px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 30px;
+  padding-right: 30px;
+
 }
