@@ -15,25 +15,21 @@ function App() {
   const [board, setBoard] = useState(emptyBoard());
 
   function emptyBoard(){
-    return [...Array(3)].map(() => Array(3).fill("null"));
+    return [...Array(5)].map(() => Array(5).fill("null"));
   }
 
   function updateBoard(newBoard){
     setBoard([...newBoard]);
   }
 
+  function updateSize(size){
+    setSize(size);
+  }
+
   function handleTurn(){
     setTurn(turn + 1);
     setNewGame(false);
     handleAnnouncement(turn + 1);
-
-    // scanBoard();
-    // if (!won) {
-    //   handleAnnouncement(turn + 1);
-    // }
-    // else{
-    //   handleAnnouncement(100);
-    // }
   }
 
   function restartTurn(){
@@ -49,7 +45,7 @@ function App() {
     let string = "";
     if (turn == 100) {string = "Game end, " + winner + " wins!";}
     else{
-      if (turn <= 9) {
+      if (turn <= size*size) {
         string = "Turn " + turn + ", " + mark + "'s move";
       }
       else{
@@ -59,23 +55,87 @@ function App() {
     setAnnouncement(string);
   }
 
-  function scanBoard(){
-    if ((board[0][0] == board[0][1] && board[0][1] == board[0][2]) && (board[0][0] != "null")) {setWon(true); setWinner(board[0][0]);}
-    if ((board[1][0] == board[1][1] && board[1][1] == board[1][2]) && (board[1][0] != "null")) {setWon(true); setWinner(board[1][0]);}
-    if ((board[2][0] == board[2][1] && board[2][1] == board[2][2]) && (board[2][0] != "null")) {setWon(true); setWinner(board[2][0]);}
-    if ((board[0][0] == board[1][0] && board[1][0] == board[2][0]) && (board[0][0] != "null")) {setWon(true); setWinner(board[0][0]);}
-    if ((board[0][1] == board[1][1] && board[1][1] == board[2][1]) && (board[0][1] != "null")) {setWon(true); setWinner(board[0][1]);}
-    if ((board[0][2] == board[1][2] && board[1][2] == board[2][2]) && (board[0][2] != "null")) {setWon(true); setWinner(board[0][2]);}
-    if ((board[0][0] == board[1][1] && board[1][1] == board[2][2]) && (board[0][0] != "null")) {setWon(true); setWinner(board[0][0]);}
-    if ((board[2][0] == board[1][1] && board[1][1] == board[0][2]) && (board[2][0] != "null")) {setWon(true); setWinner(board[2][0]);}
+  function scanBoard(size){
+    // if (size == 3){
+    //   if ((board[0][0] == board[0][1] && board[0][1] == board[0][2]) && (board[0][0] != "null")) {setWon(true); setWinner(board[0][0]);}
+    //   if ((board[1][0] == board[1][1] && board[1][1] == board[1][2]) && (board[1][0] != "null")) {setWon(true); setWinner(board[1][0]);}
+    //   if ((board[2][0] == board[2][1] && board[2][1] == board[2][2]) && (board[2][0] != "null")) {setWon(true); setWinner(board[2][0]);}
+    //   if ((board[0][0] == board[1][0] && board[1][0] == board[2][0]) && (board[0][0] != "null")) {setWon(true); setWinner(board[0][0]);}
+    //   if ((board[0][1] == board[1][1] && board[1][1] == board[2][1]) && (board[0][1] != "null")) {setWon(true); setWinner(board[0][1]);}
+    //   if ((board[0][2] == board[1][2] && board[1][2] == board[2][2]) && (board[0][2] != "null")) {setWon(true); setWinner(board[0][2]);}
+    //   if ((board[0][0] == board[1][1] && board[1][1] == board[2][2]) && (board[0][0] != "null")) {setWon(true); setWinner(board[0][0]);}
+    //   if ((board[2][0] == board[1][1] && board[1][1] == board[0][2]) && (board[2][0] != "null")) {setWon(true); setWinner(board[2][0]);}
+    // }
+    // else if (size == 4){
+    //   if ((board[0][0] == board[0][1] && board[0][1] == board[0][2] && board[0][2] == board[0][3]) && (board[0][0] != "null")) {setWon(true); setWinner(board[0][0]);}
+    //   if ((board[1][0] == board[1][1] && board[1][1] == board[1][2]) && (board[1][0] != "null")) {setWon(true); setWinner(board[1][0]);}
+    //   if ((board[2][0] == board[2][1] && board[2][1] == board[2][2]) && (board[2][0] != "null")) {setWon(true); setWinner(board[2][0]);}
+    //   if ((board[0][0] == board[1][0] && board[1][0] == board[2][0]) && (board[0][0] != "null")) {setWon(true); setWinner(board[0][0]);}
+    //   if ((board[0][1] == board[1][1] && board[1][1] == board[2][1]) && (board[0][1] != "null")) {setWon(true); setWinner(board[0][1]);}
+    //   if ((board[0][2] == board[1][2] && board[1][2] == board[2][2]) && (board[0][2] != "null")) {setWon(true); setWinner(board[0][2]);}
+    //   if ((board[0][0] == board[1][1] && board[1][1] == board[2][2]) && (board[0][0] != "null")) {setWon(true); setWinner(board[0][0]);}
+    //   if ((board[2][0] == board[1][1] && board[1][1] == board[0][2]) && (board[2][0] != "null")) {setWon(true); setWinner(board[2][0]);}
+    // }
+    checkRow(size);
+    checkCol(size);
+    checkDiag(size);
   }
+
+  function allEqual(arr){
+    return arr.every(val => val === arr[0] && arr[0] != "null");
+  }
+
+  function checkRow(size){
+    for (let row = 0; row < size; row++){
+      let rowMarks = [];
+      console.log(board[row]);
+      for (let col = 0; col < size; col++){
+        rowMarks.push(board[row][col]);
+      }
+      if (allEqual(rowMarks)){
+        setWon(true);
+        setWinner(board[row][0]);
+      }
+    }
+  }
+
+  function checkCol(size){
+    for (let col = 0; col < size; col++){
+      let colMarks = [];
+      for (let row = 0; row < size; row++){
+        colMarks.push(board[row][col]);
+      }
+      if (allEqual(colMarks)){
+        setWon(true);
+        setWinner(board[0][col]);
+      }
+    }
+  }
+
+  function checkDiag(size){
+    let leftDiag = [];
+    let rightDiag = [];
+    for (let i = 0, j = size - 1; i < size && j >= 0; i++, j--){
+      rightDiag.push(board[i][i]);
+      leftDiag.push(board[i][j]);
+    }
+    console.log(rightDiag);
+    if (allEqual(leftDiag) || allEqual(rightDiag)){
+      setWon(true);
+      setWinner(leftDiag[1]);
+    }
+  }
+
+  useEffect(() =>{
+    restartTurn();
+  }, [size])
 
   useEffect(() =>{
     setBoard(board);
   }, [board])
 
   useEffect(() => {
-    if (turn > 4) {scanBoard();}
+    if (turn > 4) {scanBoard(size);}
   }, [turn])
 
   useEffect(() => {
@@ -85,38 +145,53 @@ function App() {
       console.log("global won: ");
     }
   }, [won])
+
+  const small = 3;
+  const medium = 4;
+  const large = 5;
  
   return (
     <div className="App">
       <h1>{announcement}</h1>
-      <h2>{newGame}</h2>
+      {/* <h2>{newGame}</h2> */}
       <FullBoard turn={turn} handleTurn={handleTurn} newGame={newGame} size={size} boardState={board} updateBoard={updateBoard} won={won}/>
       <RestartButton restartTurn={restartTurn}/>
+      <div className="sizeRows">
+        <SizeButton size={small} setSize={updateSize}/>
+        <SizeButton size={medium} setSize={updateSize}/>
+        <SizeButton size={large} setSize={updateSize}/>
+      </div>
     </div>
   );
 }
 
 function Cross(){
   return(
-    <h3 className="cross">
+    <div className="cross">
       X
-    </h3>
+    </div>
   );
 }
 
 function Circle(){
   return(
-    <h3 className="circle">
+    <div className="circle">
       O
-    </h3>
+    </div>
   );
 }
 
-function Square({turn, handleTurn, newGame, id, row, col, boardState, updateBoard, won}){
+function Square({turn, handleTurn, newGame, id, row, col, boardState, updateBoard, won, size}){
   const [mark, setMark] = useState("null");
   const [isMarked, setIsMarked] = useState(false);
+  const [styleClass, setStyleClass] = useState("square-large")
 
   let board = boardState;
+  useEffect(() => {
+    if (size == 3) {setStyleClass("square-large");}
+    if (size == 4) {setStyleClass("square-medium");}
+    if (size == 5) {setStyleClass("square-small");}
+  }, [size])
 
   useEffect(() =>{
     if (newGame){
@@ -148,7 +223,7 @@ function Square({turn, handleTurn, newGame, id, row, col, boardState, updateBoar
 
   return(
     <>
-      <button id={id} className="square" onClick={handleMark}>{mark}</button>
+      <button id={id} className={styleClass} onClick={handleMark}>{mark}</button>
     </>
   );
 }
@@ -158,26 +233,26 @@ function BoardRow({turn, handleTurn, newGame, size, row, boardState, updateBoard
   let col = 0;
   for (let i = 1; i <= size; i++) {
     let id = 0;
-    if (row == 0){
-      id = i;
-    }
-    else if (row == 1){
-      id = i + size;
-    }
-    else if (row == 2){
-      id = i + (size * 2);
-    }
+    id = i + (size * row);
     col = i - 1;
-    squares.push(Square({turn, handleTurn, newGame, id, row, col, boardState, updateBoard, won}));
+    // squares.push(Square({turn, handleTurn, newGame, id, row, col, boardState, updateBoard, won}));
+    squares.push(
+      <Square turn={turn} handleTurn={handleTurn} newGame={newGame} id={id} row={row} col={col} 
+      boardState={boardState} updateBoard={updateBoard} won={won} size={size}/>
+    )
   }
-  return <div>{squares}</div>
+  return <div className="row">{squares}</div>
 }
 
 function FullBoard({turn, handleTurn, newGame, size, boardState, updateBoard, won}){
   let rows = [];
   let row = 0;
   while (row <= size-1) {
-    rows.push(BoardRow({turn, handleTurn, newGame, size, row, boardState, updateBoard, won}));
+    // rows.push(BoardRow({turn, handleTurn, newGame, size, row, boardState, updateBoard, won}));
+    rows.push(
+      <BoardRow turn={turn} handleTurn={handleTurn} newGame={newGame} size={size} row={row} 
+      boardState={boardState} updateBoard={updateBoard} won={won}/>
+    )
     row++;
   }
   return rows;          
@@ -189,6 +264,19 @@ function RestartButton({restartTurn}){
     <button className="restartButton" onClick={restartTurn}>Restart</button>
   );
 
+}
+
+function SizeButton({size, setSize}){
+  let btnSize = size;
+
+  function updateSize(btnSize){
+    console.log(size + typeof(size));
+    setSize(size);
+  }
+
+  return (
+    <button className="sizeButton" onClick={updateSize}>{btnSize} x {btnSize}</button>
+  );
 }
 
 export default App; 
