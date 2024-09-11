@@ -1,8 +1,13 @@
+@import url("https://fonts.googleapis.com/css2?family=Carter+One&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Carter+One&family=Monoton&display=swap");
+
 .App {
   text-align: center;
   color: #333333;
   height: 100vh;
 }
+
+
 
 .App-logo {
   height: 40vmin;
@@ -96,6 +101,8 @@
 
 .restartButton {
   margin-top: 30px;
+  margin-left: 20px;
+  margin-right:20px;
   padding-top: 7px;
   padding-bottom: 7px;
   padding-left: 30px;

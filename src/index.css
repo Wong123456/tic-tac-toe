@@ -1,5 +1,5 @@
 body {
-  background-image: url(PURPLE.jpg);
+  background-image: url(../public/PURPLE.jpg);
   background-repeat:repeat-x;
   background-size: contain;
   background-color: #1A0F31;
