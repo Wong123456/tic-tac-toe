@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import {useState} from 'react';
 import {useEffect} from 'react';
@@ -13,13 +12,32 @@ function App() {
   const [winner, setWinner] = useState("");
   const [size, setSize] = useState(3);
   const [board, setBoard] = useState(emptyBoard());
+  const [history, setHistory] = useState(emptyHistory());
+  const [undid, setUndid] = useState(emptyHistory());
+  const [undoState, setUndoState] = useState(false);
 
   function emptyBoard(){
     return [...Array(5)].map(() => Array(5).fill("null"));
   }
 
+  function emptyHistory(){
+    return [];
+  }
+
   function updateBoard(newBoard){
     setBoard([...newBoard]);
+  }
+
+  function toggleUndoState(){
+    setUndoState(!undoState);
+  }
+
+  function addHistory(history){
+    setHistory(prevHistory => [...prevHistory, history]);
+  }
+
+  function addUndid(history){
+    setUndid(prevUndid => [...prevUndid, history]);
   }
 
   function updateSize(size){
@@ -27,14 +45,34 @@ function App() {
   }
 
   function handleTurn(){
+    addHistory(structuredClone(board));
     setTurn(turn + 1);
     setNewGame(false);
     handleAnnouncement(turn + 1);
   }
 
+  useEffect(() =>{
+    console.log("History:");
+    console.log(history);
+  }, [history])
+
+  useEffect(() =>{
+    console.log("Board:");
+    console.log(board);
+  }, [board])
+
+  function undo(){
+    let curTurn = turn - 1;
+    let prevTurn = turn - 2;
+    setTurn(prevTurn);
+    handleAnnouncement(turn - 1);
+    updateBoard(history[prevTurn - 1]);
+  }
+
   function restartTurn(){
     setTurn(1);
     setBoard(emptyBoard());
+    setHistory(emptyHistory());
     handleAnnouncement(1);
     setNewGame(true);
     setWon(false);
@@ -88,7 +126,6 @@ function App() {
   function checkRow(size){
     for (let row = 0; row < size; row++){
       let rowMarks = [];
-      console.log(board[row]);
       for (let col = 0; col < size; col++){
         rowMarks.push(board[row][col]);
       }
@@ -119,7 +156,6 @@ function App() {
       rightDiag.push(board[i][i]);
       leftDiag.push(board[i][j]);
     }
-    console.log(rightDiag);
     if (allEqual(leftDiag) || allEqual(rightDiag)){
       setWon(true);
       setWinner(leftDiag[1]);
@@ -130,10 +166,6 @@ function App() {
     restartTurn();
   }, [size])
 
-  useEffect(() =>{
-    setBoard(board);
-  }, [board])
-
   useEffect(() => {
     if (turn > 4) {scanBoard(size);}
   }, [turn])
@@ -142,7 +174,6 @@ function App() {
     if (won){
       handleAnnouncement(100);
       // setWon(false);
-      console.log("global won: ");
     }
   }, [won])
 
@@ -155,6 +186,7 @@ function App() {
       <h1>{announcement}</h1>
       {/* <h2>{newGame}</h2> */}
       <FullBoard turn={turn} handleTurn={handleTurn} newGame={newGame} size={size} boardState={board} updateBoard={updateBoard} won={won}/>
+      <UndoButton undo={undo} undoState={undoState}/>
       <RestartButton restartTurn={restartTurn}/>
       <div className="sizeRows">
         <SizeButton size={small} setSize={updateSize}/>
@@ -162,6 +194,12 @@ function App() {
         <SizeButton size={large} setSize={updateSize}/>
       </div>
     </div>
+  );
+}
+
+function UndoButton({undo}){
+  return(
+    <button className='undo' onClick={undo}>Undo</button>
   );
 }
 
@@ -200,23 +238,31 @@ function Square({turn, handleTurn, newGame, id, row, col, boardState, updateBoar
     }
   }, [newGame])
 
-  function handleMark(){
-    console.log(row, col);
+  useEffect(() =>{
+    const readMark = board[row][col];
+    if (readMark == "X") {setMark(Cross()); setIsMarked(true);}
+    else if (readMark == "O") {setMark(Circle()); setIsMarked(true);}
+    else if (readMark === "null"){
+      setMark("null");
+      setIsMarked(false);
+    }
+    console.log("Square:");
+    console.log(board);
+  }, [board])
 
+  function handleMark(){
     if (!isMarked && !won){
-      if(won) {console.log("won");}
-      else if (!won) {console.log("not won");}
       if (turn %2 === 0) {
-        setMark(Cross());
+        // setMark(Cross());
         board[row][col] = "X";
       }
       else {
-        setMark(Circle());
+        // setMark(Circle());
         board[row][col] = "O";
       }
 
       handleTurn();
-      setIsMarked(true);
+      // setIsMarked(true);
       updateBoard(board);
     }
   }
@@ -270,7 +316,6 @@ function SizeButton({size, setSize}){
   let btnSize = size;
 
   function updateSize(btnSize){
-    console.log(size + typeof(size));
     setSize(size);
   }
 
