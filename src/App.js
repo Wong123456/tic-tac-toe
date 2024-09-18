@@ -235,27 +235,64 @@ function Square({ turn, handleTurn, newGame, id, row, col, boardState, updateBoa
 }
 
 function BoardRow({ turn, handleTurn, newGame, size, row, boardState, updateBoard, won }) {
-  let squares = []; 
-  let col = 0; 
+  // let squares = []; 
+  // let col = 0; 
 
-  for (let i = 1; i <= size; i++) { 
-    let id = 0; id = i + (size * row); 
-    col = i - 1; 
-    squares.push(<Square turn={turn} handleTurn={handleTurn} newGame={newGame} id={id} row={row}
-      col={col} boardState={boardState} updateBoard={updateBoard} won={won} size={size} />) 
-    } 
-    return <div className="row">{squares}</div> 
+  // for (let i = 1; i <= size; i++) { 
+  //   let id = 0; id = i + (size * row); 
+  //   col = i - 1; 
+  //   squares.push(<Square turn={turn} handleTurn={handleTurn} newGame={newGame} id={id} row={row}
+  //     col={col} boardState={boardState} updateBoard={updateBoard} won={won} size={size} />) 
+  //   } 
+  //   return <div className="row">{squares}</div> 
+
+
+  //self try recursion
+  // let squares = [];
+  // function generateSquares(col, squares){
+  //   let arr = squares;
+  //   arr.push(<Square turn={turn} handleTurn={handleTurn} newGame={newGame} id={col + 1 + size * row} 
+  //     row={row} col={col} boardState={boardState} updateBoard={updateBoard} won={won} size={size} />);
+
+  //   if (col >= size - 1) {return arr;}
+  //   return generateSquares(col + 1, arr);
+  // }
+
+  //advanced recursion (model answer by blackbox)
+  function generateSquares(col){
+    if (col >= size) return [];
+    return[
+      <Square turn={turn} handleTurn={handleTurn} newGame={newGame} id={col + 1 + size * row} 
+      row={row} col={col} boardState={boardState} updateBoard={updateBoard} won={won} size={size} />,
+      ...generateSquares(col + 1)
+    ];
+  }
+
+  return (
+  <div>{generateSquares(0)}</div>
+  );
+
   }
 
 function FullBoard({ turn, handleTurn, newGame, size, boardState, updateBoard, won }) {
-  let rows = [];
-  let row = 0;
-  while (row <= size - 1) {
-    rows.push(<BoardRow turn={turn} handleTurn={handleTurn} newGame={newGame} size={size}
-      row={row} boardState={boardState} updateBoard={updateBoard} won={won} />);
-    row++;
+  // let rows = [];
+  // let row = 0;
+  // while (row <= size - 1) {
+  //   rows.push(<BoardRow turn={turn} handleTurn={handleTurn} newGame={newGame} size={size}
+  //     row={row} boardState={boardState} updateBoard={updateBoard} won={won} />);
+  //   row++;
+  // }
+  // return rows;
+
+  function generateRows(row){
+    if (row >= size) return [];
+    return[
+      <BoardRow turn={turn} handleTurn={handleTurn} newGame={newGame} size={size}
+      row={row} boardState={boardState} updateBoard={updateBoard} won={won} />,
+      ...generateRows(row + 1)
+    ];
   }
-  return rows;
+  return generateRows(0);
 }
 
 function RestartButton({ restartTurn }) {
