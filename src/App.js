@@ -71,13 +71,32 @@ function App() {
   useEffect(() => { 
     console.log(historyPtr); 
     if (undoState) { 
-      updateBoard(structuredClone(history[historyPtr][0])); 
-      let lastRoundTurn = history[historyPtr][1]; 
+      updateBoard(structuredClone(getHistoryBoard)); 
+      let lastRoundTurn = getHistoryTurn; 
       setTurn(lastRoundTurn + 1); 
     } 
   }, [historyPtr])
 
   useEffect(() => { console.log("Turn:" + turn); }, [board])
+
+  const curry = (fn) => {
+    let curried = (...args) =>{
+        if (fn.length !== args.length){
+            return curried.bind(null, ...args);
+        }
+        return fn(...args);
+    };
+    return curried;
+  }
+
+  function getBoardHistory(ptr, entry){
+    return history[ptr][entry];
+  }
+
+  const curriedGetBoardHistory = curry(getBoardHistory);
+  const getHistoryEntry = curriedGetBoardHistory(historyPtr);
+  const getHistoryTurn = getHistoryEntry(1);
+  const getHistoryBoard = getHistoryEntry(0);
 
   function undo() { 
     if (historyPtr != 0) { 
