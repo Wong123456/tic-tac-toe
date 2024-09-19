@@ -150,15 +150,30 @@ function App() {
   }
 
   function checkRow(size) { 
-    for (let row = 0; row < size; row++) {
-      let rowMarks = []; 
-      for (let col = 0; col < size; col++) { 
-        rowMarks.push(board[row][col]); 
-      } 
-      if (allEqual(rowMarks)) { 
-        setWon(true); setWinner(board[row][0]); 
-      } 
-    } 
+    // for (let row = 0; row < size; row++) {
+    //   let rowMarks = []; 
+    //   for (let col = 0; col < size; col++) { 
+    //     rowMarks.push(board[row][col]); 
+    //   } 
+    //   if (allEqual(rowMarks)) { 
+    //     setWon(true); setWinner(board[row][0]); 
+    //   } 
+    // } 
+
+    function getRow(row){
+      function getSquare(col){
+        if (col >= size) return [];
+        return [board[row][col], ...getSquare(col + 1)];
+      }
+      const rowMarks = getSquare(0);
+      if (allEqual(rowMarks)){
+        setWon(true); setWinner(rowMarks[0]);
+      }
+      if (row >= size) {return;}
+      return getRow(row + 1);
+    }
+
+    return getRow(0);
   }
 
   function checkCol(size) { 
