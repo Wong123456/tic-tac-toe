@@ -118,6 +118,7 @@ function App() {
     setTurn(1); 
     setBoard(emptyBoard()); 
     setHistory(emptyHistory()); 
+    setHistoryPtr(0);
     setNewGame(true); 
     setWon(false); 
   }
