@@ -41,15 +41,13 @@ function App() {
     if (undoState) { 
       setHistoryPtr(history.length); 
       toggleUndoState(); 
-      setTurn(turn + 1); 
     } 
     else {
       setHistoryPtr(historyPtr + 1); 
-      setTurn(turn + 1);
 
     }
     setNewGame(false);
-    handleAnnouncement(turn + 1);
+    setTurn(turn + 1);
   }
 
   useEffect(() => { restartTurn(); }, [size])
@@ -64,20 +62,12 @@ function App() {
   useEffect(() => { if (won) { handleAnnouncement(100); } }, [won])
 
   useEffect(() => { 
-    console.log("History:"); 
-    console.log(history); 
-  }, [history])
-
-  useEffect(() => { 
-    console.log(historyPtr); 
     if (undoState) { 
       updateBoard(structuredClone(getHistoryBoard)); 
       let lastRoundTurn = getHistoryTurn; 
       setTurn(lastRoundTurn + 1); 
     } 
   }, [historyPtr])
-
-  useEffect(() => { console.log("Turn:" + turn); }, [board])
 
   const curry = (fn) => {
     let curried = (...args) =>{
