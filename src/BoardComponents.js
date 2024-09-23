@@ -1,4 +1,4 @@
-import {useState, useEffect, useContext} from 'react';
+import {useState, useEffect, useContext, useRef} from 'react';
 import { BoardContext } from './App';
 
 function Cross() { return (<div className="cross"> X </div>); }
@@ -9,7 +9,7 @@ function Square({props, row, col, id}) {
   const [mark, setMark] = useState("null");
   const [isMarked, setIsMarked] = useState(false);
   const [styleClass, setStyleClass] = useState("square-large")
-
+  const prevMark = useRef(mark);
 
   let board = props.board;
   let updateBoard = props.updateBoard;
@@ -35,12 +35,18 @@ function Square({props, row, col, id}) {
 
   useEffect(() => {
     const readMark = board[row][col];
-    if (readMark == "X") {
-      setMark(Cross()); setIsMarked(true);
-    } else if (readMark == "O") {
-      setMark(Circle()); setIsMarked(true);
-    } else if (readMark === "null") {
-      setMark("null"); setIsMarked(false);
+    console.log("prev: " + prevMark.current + ", cur: " + readMark);
+    if (readMark != prevMark.current){
+        console.log("rendered");
+        prevMark.current = readMark;
+        if (readMark == "X") {
+        setMark(Cross()); setIsMarked(true);
+        } else if (readMark == "O") {
+        setMark(Circle()); setIsMarked(true);
+        } else if (readMark === "null") {
+        setMark("null"); setIsMarked(false);
+        }
+
     }
   }, [board])
 
