@@ -1,16 +1,46 @@
-import './App.css'; import { useState } from 'react'; import { useEffect } from 'react';
+import './App.css'; 
+import { useState, useEffect, createContext } from 'react';
+import {FullBoard} from './BoardComponents';
+import {RedoButton, UndoButton, RestartButton, SizeButton} from './TurnManagementComponents';
+import { Debug } from './BoardComponents';
+
+export const BoardContext = createContext(null);
+// let props = {
+//   turn: turn,
+//   newGame: newGame,
+//   won: won,
+//   winner: winner,
+//   size: size,
+//   board: board,
+//   undoState: undoState,
+//   handleTurn: handleTurn,
+//   updateBoard: updateBoard
+// };
 
 function App() {
   const [turn, setTurn] = useState(1); 
   const [announcement, setAnnouncement] = useState("Turn 1, O's move"); 
   const [newGame, setNewGame] = useState(true); 
-  const [won, setWon] = useState(false); 
+  const [won, setWon] = useState(false);
   const [winner, setWinner] = useState(""); 
   const [size, setSize] = useState(3); 
   const [board, setBoard] = useState(emptyBoard()); 
   const [history, setHistory] = useState(emptyHistory()); 
   const [undoState, setUndoState] = useState(false); 
   const [historyPtr, setHistoryPtr] = useState(0);
+
+  // const BoardContext = createContext(undefined);
+  let props = {
+    turn: turn,
+    newGame: newGame,
+    won: won,
+    winner: winner,
+    size: size,
+    board: board,
+    undoState: undoState,
+    handleTurn: handleTurn,
+    updateBoard: updateBoard
+  }
 
   function emptyBoard() { 
     return [...Array(5)].map(() => Array(5).fill("null")); 
@@ -196,139 +226,13 @@ function App() {
   return (
   <div className="App"> 
   <h1>{announcement}</h1> 
-  <FullBoard turn={turn} handleTurn={handleTurn} newGame={newGame} size={size} 
-  boardState={board} updateBoard={updateBoard} won={won} /> 
+  <BoardContext.Provider value={props}><FullBoard /></BoardContext.Provider>
   <UndoButton undo={undo} /> 
   <RestartButton restartTurn={restartTurn} /> 
   <RedoButton redo={redo} /> <div className="sizeRows"> 
     <SizeButton size={small} setSize={updateSize} /> 
     <SizeButton size={medium} setSize={updateSize} /> 
     <SizeButton size={large} setSize={updateSize} /> </div> </div>);
-}
-
-function RedoButton({ redo }) { return (<button className='redo' onClick={redo}>Redo</button>); }
-
-function UndoButton({ undo }) { return (<button className='undo' onClick={undo}>Undo</button>); }
-
-function Cross() { return (<div className="cross"> X </div>); }
-
-function Circle() { return (<div className="circle"> O </div>); }
-
-function Square({ turn, handleTurn, newGame, id, row, col, boardState, updateBoard, won, size }) {
-  const [mark, setMark] = useState("null");
-  const [isMarked, setIsMarked] = useState(false); 
-  const [styleClass, setStyleClass] = useState("square-large")
-
-  let board = boardState; 
-  
-  useEffect(() => { 
-    if (size == 3) { setStyleClass("square-large"); } 
-    if (size == 4) { setStyleClass("square-medium"); } 
-    if (size == 5) { setStyleClass("square-small"); } 
-  }, [size])
-
-  useEffect(() => { 
-    if (newGame) { 
-      setMark("null"); 
-      setIsMarked(false); 
-    }
-  }, [newGame])
-
-  useEffect(() => { 
-    const readMark = board[row][col]; 
-    if (readMark == "X") { 
-      setMark(Cross()); setIsMarked(true); 
-    } else if (readMark == "O") { 
-      setMark(Circle()); setIsMarked(true); 
-    } else if (readMark === "null") { 
-      setMark("null"); setIsMarked(false); 
-    } 
-  }, [board])
-
-  function handleMark() {
-    if (!isMarked && !won) {
-      if (turn % 2 === 0) { board[row][col] = "X"; } else { board[row][col] = "O"; }
-
-      handleTurn();
-      updateBoard(board);
-    }
-  }
-
-  return (
-    <button id={id} className={styleClass} onClick={handleMark}>{mark}</button>
-  );
-}
-
-function BoardRow({ turn, handleTurn, newGame, size, row, boardState, updateBoard, won }) {
-  // let squares = []; 
-  // let col = 0; 
-
-  // for (let i = 1; i <= size; i++) { 
-  //   let id = 0; id = i + (size * row); 
-  //   col = i - 1; 
-  //   squares.push(<Square turn={turn} handleTurn={handleTurn} newGame={newGame} id={id} row={row}
-  //     col={col} boardState={boardState} updateBoard={updateBoard} won={won} size={size} />) 
-  //   } 
-  //   return <div className="row">{squares}</div> 
-
-
-  //self try recursion
-  // let squares = [];
-  // function generateSquares(col, squares){
-  //   let arr = squares;
-  //   arr.push(<Square turn={turn} handleTurn={handleTurn} newGame={newGame} id={col + 1 + size * row} 
-  //     row={row} col={col} boardState={boardState} updateBoard={updateBoard} won={won} size={size} />);
-
-  //   if (col >= size - 1) {return arr;}
-  //   return generateSquares(col + 1, arr);
-  // }
-
-  //advanced recursion (model answer by blackbox)
-  function generateSquares(col){
-    if (col >= size) return [];
-    return[
-      <Square turn={turn} handleTurn={handleTurn} newGame={newGame} id={col + 1 + size * row} 
-      row={row} col={col} boardState={boardState} updateBoard={updateBoard} won={won} size={size} />,
-      ...generateSquares(col + 1)
-    ];
-  }
-
-  return (
-  <div>{generateSquares(0)}</div>
-  );
-
-  }
-
-function FullBoard({ turn, handleTurn, newGame, size, boardState, updateBoard, won }) {
-  // let rows = [];
-  // let row = 0;
-  // while (row <= size - 1) {
-  //   rows.push(<BoardRow turn={turn} handleTurn={handleTurn} newGame={newGame} size={size}
-  //     row={row} boardState={boardState} updateBoard={updateBoard} won={won} />);
-  //   row++;
-  // }
-  // return rows;
-
-  function generateRows(row){
-    if (row >= size) return [];
-    return[
-      <BoardRow turn={turn} handleTurn={handleTurn} newGame={newGame} size={size}
-      row={row} boardState={boardState} updateBoard={updateBoard} won={won} />,
-      ...generateRows(row + 1)
-    ];
-  }
-  return generateRows(0);
-}
-
-function RestartButton({ restartTurn }) {
-  return (<button className="restartButton" onClick={restartTurn}>Restart</button>);
-}
-
-function SizeButton({ size, setSize }) {
-  let btnSize = size;
-  function updateSize(btnSize) { setSize(size); }
-
-  return (<button className="sizeButton" onClick={updateSize}>{btnSize} x {btnSize}</button>);
 }
 
 export default App;
