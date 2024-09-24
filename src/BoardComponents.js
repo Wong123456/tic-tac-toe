@@ -1,4 +1,4 @@
-import {useState, useEffect, useContext, useRef} from 'react';
+import {useState, useEffect, useContext, useRef, useCallback} from 'react';
 import { BoardContext } from './App';
 
 function Cross() { return (<div className="cross"> X </div>); }
@@ -36,9 +36,9 @@ function Square({props, row, col, id}) {
   useEffect(() => {
     const readMark = board[row][col];
     console.log("prev: " + prevMark.current + ", cur: " + readMark);
-    if (readMark != prevMark.current){
+    // if (readMark != prevMark.current){
         console.log("rendered");
-        prevMark.current = readMark;
+    //     prevMark.current = readMark;
         if (readMark == "X") {
         setMark(Cross()); setIsMarked(true);
         } else if (readMark == "O") {
@@ -46,9 +46,8 @@ function Square({props, row, col, id}) {
         } else if (readMark === "null") {
         setMark("null"); setIsMarked(false);
         }
-
-    }
-  }, [board])
+    // }
+  }, [board[row][col]])
 
   function handleMark() {
     if (!isMarked && !won) {
@@ -105,21 +104,35 @@ function BoardRow({props, row}) {
 
 export function FullBoard() {
   const props = useContext(BoardContext);
-  // let rows = [];
-  // let row = 0;
-  // while (row <= size - 1) {
-  //   rows.push(<BoardRow turn={turn} handleTurn={handleTurn} newGame={newGame} size={size}
-  //     row={row} boardState={boardState} updateBoard={updateBoard} won={won} />);
-  //   row++;
-  // }
-  // return rows;
-
-  function generateRows(row){
-    if (row >= props.size) return [];
-    return[
-      <BoardRow props={props} row={row}/>,
-      ...generateRows(row + 1)
-    ];
+  let rows = [];
+  let row = 0;
+  while (row <= props.size - 1) {
+    rows.push(<BoardRow props={props} row={row}/>);
+    row++;
   }
-  return generateRows(0);
+  return rows;
+
+  // const renderBoard = useCallback(() =>{
+  //   let rows = [];
+  //   let row = 0;
+  //   while (row <= props.size - 1) {
+  //     rows.push(<BoardRow props={props} row={row}/>);
+  //     row++;
+  //   }
+  //   return rows;
+  // }, [props.size])
+
+  // renderBoard();
+
+  // function generateRows(row){
+  //   if (row >= props.size) return [];
+  //   return[
+  //     <BoardRow props={props} row={row}/>,
+  //     ...generateRows(row + 1)
+  //   ];  
+  // }
+  
+  // return generateRows(0);
+  
 }
+

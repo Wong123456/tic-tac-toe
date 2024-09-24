@@ -1,21 +1,9 @@
 import './App.css'; 
-import { useState, useEffect, createContext } from 'react';
+import { useState, useEffect, createContext, useCallback } from 'react';
 import {FullBoard} from './BoardComponents';
 import {RedoButton, UndoButton, RestartButton, SizeButton} from './TurnManagementComponents';
-import { Debug } from './BoardComponents';
 
 export const BoardContext = createContext(null);
-// let props = {
-//   turn: turn,
-//   newGame: newGame,
-//   won: won,
-//   winner: winner,
-//   size: size,
-//   board: board,
-//   undoState: undoState,
-//   handleTurn: handleTurn,
-//   updateBoard: updateBoard
-// };
 
 function App() {
   const [turn, setTurn] = useState(1); 
@@ -29,7 +17,6 @@ function App() {
   const [undoState, setUndoState] = useState(false); 
   const [historyPtr, setHistoryPtr] = useState(0);
 
-  // const BoardContext = createContext(undefined);
   let props = {
     turn: turn,
     newGame: newGame,
@@ -48,7 +35,7 @@ function App() {
 
   function emptyHistory() { 
     return [[emptyBoard(), 0]]; 
-  }
+  }  
 
   function updateBoard(newBoard) { 
     setBoard([...newBoard]); 
@@ -159,11 +146,17 @@ function App() {
     setAnnouncement(string); 
   }
 
-  function scanBoard(size) { 
+  // function scanBoard(size) { 
+  //   checkRow(size); 
+  //   checkCol(size); 
+  //   checkDiag(size); 
+  // }
+
+  const scanBoard = useCallback((size) =>{
     checkRow(size); 
     checkCol(size); 
     checkDiag(size); 
-  }
+  }, [])
 
   function allEqual(arr) { 
     return arr.every(val => val === arr[0] && arr[0] != "null"); 
