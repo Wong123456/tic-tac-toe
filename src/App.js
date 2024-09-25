@@ -2,8 +2,10 @@ import './App.css';
 import { useState, useEffect, createContext, useCallback } from 'react';
 import {FullBoard} from './BoardComponents';
 import {RedoButton, UndoButton, RestartButton, SizeButton} from './TurnManagementComponents';
+import { ThemeButton } from './Theme';
 
 export const BoardContext = createContext(null);
+export const ThemeContext = createContext(null);
 
 function App() {
   const [turn, setTurn] = useState(1); 
@@ -16,6 +18,7 @@ function App() {
   const [history, setHistory] = useState(emptyHistory()); 
   const [undoState, setUndoState] = useState(false); 
   const [historyPtr, setHistoryPtr] = useState(0);
+  const [theme, setTheme] = useState("light");
 
   let props = {
     turn: turn,
@@ -146,17 +149,11 @@ function App() {
     setAnnouncement(string); 
   }
 
-  // function scanBoard(size) { 
-  //   checkRow(size); 
-  //   checkCol(size); 
-  //   checkDiag(size); 
-  // }
-
-  const scanBoard = useCallback((size) =>{
+  function scanBoard(size) { 
     checkRow(size); 
     checkCol(size); 
     checkDiag(size); 
-  }, [])
+  }
 
   function allEqual(arr) { 
     return arr.every(val => val === arr[0] && arr[0] != "null"); 
@@ -215,17 +212,30 @@ function App() {
   const small = 3; 
   const medium = 4; 
   const large = 5;
+  const lightTheme = "light";
+  const darkTheme = "dark";
+
+  useEffect(() =>{
+    console.log(theme);
+  }, [theme])
 
   return (
   <div className="App"> 
-  <h1>{announcement}</h1> 
-  <BoardContext.Provider value={props}><FullBoard /></BoardContext.Provider>
-  <UndoButton undo={undo} /> 
-  <RestartButton restartTurn={restartTurn} /> 
-  <RedoButton redo={redo} /> <div className="sizeRows"> 
-    <SizeButton size={small} setSize={updateSize} /> 
-    <SizeButton size={medium} setSize={updateSize} /> 
-    <SizeButton size={large} setSize={updateSize} /> </div> </div>);
+  <ThemeContext.Provider value={{theme, setTheme}}>
+    <h1>{announcement}</h1> 
+    <BoardContext.Provider value={props}><FullBoard /></BoardContext.Provider>
+    <UndoButton undo={undo} /> 
+    <RestartButton restartTurn={restartTurn} /> 
+    <RedoButton redo={redo} /> 
+    <div className="sizeRows"> 
+      <SizeButton size={small} setSize={updateSize} /> 
+      <SizeButton size={medium} setSize={updateSize} /> 
+      <SizeButton size={large} setSize={updateSize} /> 
+    </div>
+    <ThemeButton theme={lightTheme} />
+    <ThemeButton theme={darkTheme} />
+  </ThemeContext.Provider>
+  </div>);
 }
 
 export default App;

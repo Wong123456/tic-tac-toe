@@ -1,29 +1,41 @@
 import {useState, useEffect, useContext, useRef, useCallback} from 'react';
-import { BoardContext } from './App';
+import { BoardContext, ThemeContext } from './App';
 
 function Cross() { return (<div className="cross"> X </div>); }
 
 function Circle() { return (<div className="circle"> O </div>); }
+
+const styleClasses = {
+  3: "square-large",
+  4: "square-medium",
+  5: "square-small"
+};
 
 function Square({props, row, col, id}) {
   const [mark, setMark] = useState("null");
   const [isMarked, setIsMarked] = useState(false);
   const [styleClass, setStyleClass] = useState("square-large")
   const prevMark = useRef(mark);
+  const themeProps = useContext(ThemeContext);
 
-  let board = props.board;
-  let updateBoard = props.updateBoard;
-  let size = props.size;
-  let newGame = props.newGame;
-  let turn = props.turn;
-  let handleTurn = props.handleTurn;
-  let won = props.won;
+  const markTypes = {
+    "X": function() {
+      setMark(Cross()); setIsMarked(true);
+    },
+    "O": function() {
+      setMark(Circle()); setIsMarked(true);
+    },
+    "null": function() {
+      setMark("null"); setIsMarked(false);
+    }
+  };
 
+  let theme = themeProps.theme;
+
+  const {board, updateBoard, size, newGame, turn, handleTurn, won} = props;
 
   useEffect(() => {
-    if (size == 3) { setStyleClass("square-large"); }
-    if (size == 4) { setStyleClass("square-medium"); }
-    if (size == 5) { setStyleClass("square-small"); }
+    setStyleClass(styleClasses[size]);
   }, [size])
 
   useEffect(() => {
@@ -35,18 +47,7 @@ function Square({props, row, col, id}) {
 
   useEffect(() => {
     const readMark = board[row][col];
-    console.log("prev: " + prevMark.current + ", cur: " + readMark);
-    // if (readMark != prevMark.current){
-        console.log("rendered");
-    //     prevMark.current = readMark;
-        if (readMark == "X") {
-        setMark(Cross()); setIsMarked(true);
-        } else if (readMark == "O") {
-        setMark(Circle()); setIsMarked(true);
-        } else if (readMark === "null") {
-        setMark("null"); setIsMarked(false);
-        }
-    // }
+    markTypes[readMark]();
   }, [board[row][col]])
 
   function handleMark() {
